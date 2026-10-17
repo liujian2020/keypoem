@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="打字摸鱼进度诗生成器——自定义敲击目标，让工作长出一句诗。">
+  <meta name="theme-color" content="#f3f0e8">
+  <title>敲诗 · 打字摸鱼进度诗生成器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="敲诗首页">
+      <span class="brand-icon">敲</span>
+      <span>敲诗<small>KEYPOEM</small></span>
+    </a>
+    <div class="listen-status" id="listenStatus">
+      <span class="status-dot"></span>
+      <span id="statusText">等待落笔</span>
+    </div>
+    <div class="header-actions">
+      <button class="text-button" id="clearHistoryButton" type="button" title="删除今天以前的本地记录">清除历史</button>
+      <button class="text-button" id="resetButton" type="button">清空今日</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-note">
+        <span id="targetBadge">200</span>
+        KEYSTROKES<br>= ONE LINE
+      </div>
+      <div class="hero-title-wrap">
+        <p class="eyebrow">打字摸鱼进度诗生成器 <i></i> 今日营业</p>
+        <h1 id="heroTitle">把键盘，<br>敲成一首<em>诗。</em></h1>
+      </div>
+      <p class="hero-copy">你负责写代码、赶文档、回消息。<br>敲击目标由你定，我负责把它藏进一行月色。</p>
+    </section>
+
+    <section class="stats" aria-label="今日打字统计">
+      <div class="stat">
+        <span>今日敲击</span>
+        <strong id="strokeCount">0</strong>
+        <small>KEYS</small>
+      </div>
+      <div class="stat">
+        <span>打字时长</span>
+        <strong id="timeCount">00:00</strong>
+        <small>ACTIVE</small>
+      </div>
+      <div class="stat">
+        <span>写成诗句</span>
+        <strong id="lineCount">0</strong>
+        <small>LINES</small>
+      </div>
+      <blockquote>“为什么做了一晚上？<br>因为敲字写诗很解压。”</blockquote>
+    </section>
+
+    <section class="workspace" aria-label="打字工作台">
+      <div class="editor-card">
+        <header class="editor-header">
+          <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <span class="file-name">今日待办.txt</span>
+          <div class="editor-actions">
+            <button class="mini-button" id="clearInputButton" type="button">清空输入</button>
+            <button class="mini-button" id="pauseButton" type="button">暂停记录</button>
+          </div>
+        </header>
+        <div class="editor-gutter" aria-hidden="true">
+          <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span>
+        </div>
+        <textarea id="writingPad" aria-label="写作区域" spellcheck="false" placeholder="从这里开始写点什么……
+
+代码、文档、周报、碎碎念都可以。
+每一次敲击，都算今天认真生活过的证据。"></textarea>
+        <footer class="editor-footer">
+          <span><i class="live-dot"></i> 只在本页记录，不读取你的内容</span>
+          <span>速度 <b id="currentSpeed">--</b> KPM　·　UTF-8　Ln <b id="cursorLine">1</b>, Col <b id="cursorColumn">1</b></span>
+        </footer>
+      </div>
+
+      <aside class="poem-card" aria-labelledby="poemTitle">
+        <div class="poem-heading">
+          <div>
+            <p>今日键盘耕作簿 · 取材于敲击速度</p>
+            <h2 id="poemTitle">打工人小诗</h2>
+          </div>
+          <time id="todayDate"></time>
+        </div>
+        <div class="poem-lines" id="poemLines" aria-live="polite">
+          <div class="empty-poem">
+            <span>⌨</span>
+            <p>诗还没来。<br>先敲下今天的第一个字吧。</p>
+          </div>
+        </div>
+        <div class="soundtrack" id="soundtrack">
+          <button class="music-button" id="musicButton" type="button" disabled aria-label="播放今日诗句合奏">
+            <span id="musicButtonIcon">▶</span>
+          </button>
+          <div class="soundtrack-copy">
+            <span>EACH POEM, ITS OWN MUSIC / 每句独立成曲</span>
+            <strong id="musicStatus">每句可单独试听，也可播放今日合奏</strong>
+            <div class="sound-wave" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+        </div>
+        <div class="signature">
+          <span></span>
+          <p>由今日的你<br>与一块键盘合著</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="progress-section" aria-labelledby="progressTitle">
+      <div class="progress-copy">
+        <p class="section-index">NEXT LINE / 下一句</p>
+        <h2 id="progressTitle"><span id="remainingCount">200</span> 次敲击后，<br>诗会继续往下长。</h2>
+      </div>
+      <div class="progress-control">
+        <div class="target-setting">
+          <label for="targetInput">每</label>
+          <input id="targetInput" type="number" min="20" max="5000" step="10" value="200" inputmode="numeric" aria-describedby="targetHint">
+          <span>次敲击写一句</span>
+          <small id="targetHint">20–5000，修改后保留当前完成比例</small>
+        </div>
+        <div class="source-setting">
+          <label for="poemSourceMode">诗句来源</label>
+          <select id="poemSourceMode">
+            <option value="mixed">三路混合</option>
+            <option value="library">古诗词库</option>
+            <option value="characters">五千字造诗</option>
+            <option value="generated">节奏原创</option>
+          </select>
+          <small>古诗匹配意境，五千字池按七言骨架选字</small>
+        </div>
+        <div class="progress-meta">
+          <span><b id="segmentCount">0</b> / <b id="targetDenominator">200</b></span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="下一句诗生成进度" aria-valuemin="0" aria-valuemax="200" aria-valuenow="0" id="progressTrack">
+          <div class="progress-fill" id="progressFill"><span>✦</span></div>
+        </div>
+        <div class="action-row">
+          <button class="primary-button" id="generateCardButton" type="button">
+            <span>生成诗歌进度笺</span><b>↗</b>
+          </button>
+          <button class="secondary-button" id="copyPoemButton" type="button">复制今日小诗</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works" aria-label="工作方式">
+      <p class="section-index">HOW IT WORKS / 不打扰的摸鱼搭子</p>
+      <div class="steps">
+        <article><span>01</span><h3>开始敲字</h3><p>在书写区写代码、文档或今天不想开会的理由。</p></article>
+        <article><span>02</span><h3>测量快慢</h3><p>最近的敲击间隔会换算成 KPM；停下休息，速度重新测量。</p></article>
+        <article><span>03</span><h3>节奏长成诗</h3><p>每 <b id="stepTarget">200</b> 次敲击，根据速度档位生成诗句和音乐。</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>敲诗 KEYPOEM · 本地存储，不上传文字</span>
+    <span>愿所有加班，至少留下一点月色。</span>
+  </footer>
+
+  <dialog class="share-dialog" id="shareDialog" aria-labelledby="shareTitle">
+    <button class="dialog-close" id="closeDialogButton" type="button" aria-label="关闭">×</button>
+    <div class="share-card" id="shareCard">
+      <div class="share-brand">敲诗 <span>KEYPOEM</span></div>
+      <p class="share-date" id="shareDate"></p>
+      <h2 id="shareTitle">今日键盘耕作簿</h2>
+      <div class="share-poem" id="sharePoem"></div>
+      <div class="share-progress">
+        <div><span>今日敲击</span><b id="shareStrokes">0</b></div>
+        <div><span>活跃时长</span><b id="shareTime">00:00</b></div>
+        <div><span>诗句</span><b id="shareLines">0 行</b></div>
+      </div>
+      <div class="barcode" aria-hidden="true"></div>
+      <p class="share-slogan">为什么做了一晚上？因为敲字写诗很解压。</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="primary-button" id="copyProgressButton" type="button">复制进度笺</button>
+      <span>可直接粘贴到群聊或朋友圈</span>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status">已复制</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
